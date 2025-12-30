@@ -10,8 +10,9 @@ setup(
         "google-api-python-client",
         "google-auth-oauthlib",
         "google-auth-httplib2",
-        "pdfkit",
+        "xhtml2pdf",
         "tqdm",
+        "beautifulsoup4",
     ],
     entry_points={
         "console_scripts": [

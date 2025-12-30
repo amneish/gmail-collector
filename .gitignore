@@ -4,3 +4,10 @@ build/
 dist/
 __pycache__/
 *.py[cod]
+
+# Credentials File
+credentials.json
+token.json
+
+# Output Folder
+gmail_archive/
