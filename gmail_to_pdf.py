@@ -134,6 +134,8 @@ def main():
         subject = next((h['value'] for h in headers if h['name'] == 'Subject'), "No Subject")
         full_from = next((h['value'] for h in headers if h['name'] == 'From'), "Unknown")
         _, sender = parseaddr(full_from)
+        full_to = next((h['value'] for h in headers if h['name'] == 'To'), "Unknown")
+        _, receiver = parseaddr(full_to)
         date = next((h['value'] for h in headers if h['name'] == 'Date'), "")
 
         # 1. Collect Attachment Filenames and Save Them
@@ -170,6 +172,7 @@ def main():
         combined_html += f"<b>Email #:</b> {email_id_counter}/{len(messages)}<br>"
         combined_html += f"<b>Subject:</b> {subject}<br>"
         combined_html += f"<b>From:</b> {sender}<br>"
+        combined_html += f"<b>To:</b> {receiver}<br>"
         combined_html += f"<b>Date:</b> {date}<br>"
         combined_html += f"<b>Attachments:</b> {att_str}" # New metadata line
         combined_html += f"</div>"
