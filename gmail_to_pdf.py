@@ -68,6 +68,20 @@ def main():
     with open('config.json') as f:
         config = json.load(f)
 
+    # Calculate full paths for clarity
+    full_output_dir = os.path.abspath(config['output_folder'])
+    full_pdf_path = os.path.join(full_output_dir, config['pdf_filename'])
+    full_config_path = os.path.abspath('config.json')
+
+    print("\n" + "="*60)
+    print("              GMAIL ARCHIVE SESSION")
+    print("="*60)
+    print(f"Config File:   {full_config_path}")
+    print(f"Search Query:  {config.get('search_query')}")
+    print(f"Output Dir:    {full_output_dir}")
+    print(f"PDF Filename:  {config.get('pdf_filename')}")
+    print("="*60 + "\n")
+
     service = get_gmail_service()
     results = service.users().messages().list(userId='me', q=config['search_query']).execute()
     messages = results.get('messages', [])
@@ -168,18 +182,23 @@ def main():
     print("\nGenerating PDF...")
     error = convert_html_to_pdf(combined_html, output_path)
     
-    if not error:
-        print(f"\nSuccess! PDF created at: {output_path}")
-    else:
+    if error:
         print("\nPDF Engine encountered minor layout issues, but the file may still be usable.")
 
     # Copy config.json to the output folder
     try:
         config_destination = os.path.join(config['output_folder'], 'config.json')
         shutil.copy2('config.json', config_destination)
-        print(f"Config reference saved to: {config_destination}")
     except Exception as e:
         print(f"Could not copy config file: {e}")
+
+    # Print summary of run
+    print("\n" + "="*60)
+    print("SUCCESS: ARCHIVE GENERATED")
+    print("="*60)
+    print(f"Consolidated PDF: {full_pdf_path}")
+    print(f"Reference Config: {os.path.join(full_output_dir, 'config_reference.json')}")
+    print("="*60)
 
 if __name__ == '__main__':
     main()
