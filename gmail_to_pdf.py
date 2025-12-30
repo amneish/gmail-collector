@@ -75,6 +75,8 @@ def main():
         print("No messages found.")
         return
 
+    config['output_folder'] = 'output_folder/' + config['output_folder']
+
     if not os.path.exists(config['output_folder']):
         os.makedirs(config['output_folder'])
 

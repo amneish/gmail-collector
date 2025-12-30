@@ -10,4 +10,4 @@ credentials.json
 token.json
 
 # Output Folder
-gmail_archive/
+output_folder/
