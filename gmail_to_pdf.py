@@ -197,7 +197,7 @@ def main():
     print("SUCCESS: ARCHIVE GENERATED")
     print("="*60)
     print(f"Consolidated PDF: {full_pdf_path}")
-    print(f"Reference Config: {os.path.join(full_output_dir, 'config_reference.json')}")
+    print(f"Reference Config: {os.path.join(full_output_dir, 'config.json')}")
     print("="*60)
 
 if __name__ == '__main__':
