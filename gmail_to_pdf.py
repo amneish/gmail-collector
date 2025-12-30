@@ -108,6 +108,9 @@ def main():
     <body>
     """
 
+    # Initialize the counter before the loop starts
+    attachment_counter = 1
+
     print(f"Found {len(messages)} messages. Processing...")
     for msg in tqdm(messages, desc="Processing Emails", unit="email"):
         m = service.users().messages().get(userId='me', id=msg['id']).execute()
@@ -119,26 +122,45 @@ def main():
         _, sender = parseaddr(full_from)
         date = next((h['value'] for h in headers if h['name'] == 'Date'), "")
 
-        raw_email_html = get_html_body(payload)
-        safe_email_html = clean_html(raw_email_html)
-
-        combined_html += f"<div class='email-container'>"
-        combined_html += f"<div class='header'><b>Subject:</b> {subject}<br>"
-        combined_html += f"<b>From:</b> {sender}<br><b>Date:</b> {date}</div>"
-        combined_html += safe_email_html
-        combined_html += "</div>"
-
-        # Attachment logic
+        # 1. Collect Attachment Filenames and Save Them
+        attachment_names = []
         if 'parts' in payload:
             for part in payload['parts']:
-                if part.get('filename'):
+                original_filename = part.get('filename')
+                if original_filename:
+                    # Create the new prefixed name
+                    new_filename = f"{attachment_counter} - {original_filename}"
+                    attachment_names.append(new_filename)
+                    
                     att_id = part['body'].get('attachmentId')
                     if att_id:
                         attachment = service.users().messages().attachments().get(
                             userId='me', messageId=msg['id'], id=att_id).execute()
                         file_data = base64.urlsafe_b64decode(attachment['data'].encode('UTF-8'))
-                        with open(os.path.join(config['output_folder'], part['filename']), 'wb') as f:
+                        
+                        # Save with the new prefixed filename
+                        with open(os.path.join(config['output_folder'], new_filename), 'wb') as f:
                             f.write(file_data)
+                        
+                        # Increment the counter for the next attachment found
+                        attachment_counter += 1
+
+        # 2. Use the list of new filenames for the PDF header
+        att_str = ", ".join(attachment_names) if attachment_names else "None"
+
+        # 3. Build the Header with Attachment Metadata
+        raw_email_html = get_html_body(payload)
+        safe_email_html = clean_html(raw_email_html)
+
+        combined_html += f"<div class='email-container'>"
+        combined_html += f"<div class='header'>"
+        combined_html += f"<b>Subject:</b> {subject}<br>"
+        combined_html += f"<b>From:</b> {sender}<br>"
+        combined_html += f"<b>Date:</b> {date}<br>"
+        combined_html += f"<b>Attachments:</b> {att_str}" # New metadata line
+        combined_html += f"</div>"
+        combined_html += safe_email_html
+        combined_html += "</div>"
 
     combined_html += "</body></html>"
     output_path = os.path.join(config['output_folder'], config['pdf_filename'])
