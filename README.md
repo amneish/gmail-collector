@@ -15,7 +15,7 @@ To run this tool, you need to create a "Desktop App" credential in Google Cloud:
    - Go to "APIs & Services" > "OAuth consent screen".
    - Select **Overview** and click Get Started.
    - Enter an App Name (e.g., "Gmail PDF Tool") and your email.
-   - **Important**: Under "Test users", click **Add Users** and enter your own Gmail address. The tool will not work without this while in "Testing" mode.
+   - **Important**: Under "Test users" in Oauth Consent Screen > Audience, click **Add Users** and enter your own Gmail address. The tool will not work without this while in "Testing" mode.
 4. **Create Credentials**:
    - Go to "Credentials" > "Create Credentials" > "OAuth client ID".
    - Select **Desktop app** as the application type.
