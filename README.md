@@ -55,3 +55,43 @@ python -m gmail_to_pdf
 A progress bar will appear in your terminal. Once complete, navigate to your output_folder. You will find:
 - A single PDF containing all email threads with their original formatting.
 - All attachments from those emails saved individually in the same folder.
+
+## 🔍 Gmail Search Filter Guide
+
+The `search_query` in your `config.json` uses standard Gmail syntax. You can combine multiple filters by simply listing them with spaces. For all query options see this [Help Page](https://support.google.com/mail/answer/7190)
+
+### Essential Filters
+| Filter | Description | Example |
+| :--- | :--- | :--- |
+| `from:` | Emails from a specific person | `from:name@example.com` |
+| `to:` | Emails sent to a specific person | `to:name@example.com` |
+| `cc:` | Finds emails where the address was Carbon Copied. | `cc:name@example.com` |
+| `subject:` | Look for words in the subject line | `subject:invoice` |
+| `has:attachment` | Only include emails with files | `has:attachment` |
+| `newer_than:` / `older_than:` | Time-based from current date (d=days, m=months, y=years) | `newer_than:30d` |
+| `after:` / `before:` | Specific date ranges (YYYY/MM/DD) | `before:2024/01/01` |
+| `'Exact Phrase'` | Use single quotes to find a specific phrase (not case sensitive) | `'Contract'` |
+| `label:` | Finds emails that you have tagged with a specific Gmail label | `label:Work` |
+| `is:unread` | Only finds emails that you have not read yet | `is:unread` |
+
+### Combining Filters with Operators
+
+The filter operators can be combined using AND, OR, NOT, and Grouping logic.
+| Operator Type | How to use it | Example query |
+| :--- | :--- | :--- |
+| AND | Space between filters | `from:boss has:attachment subject:Urgent` |
+| OR | Capital `OR` | `from:apple OR from:google` |
+| NOT | `-` (Minus - Excludes certain results) | `-from:noreply@ads.com` |
+| Grouping | Parentheses `()` | `from:me (subject:Report OR subject:Update)` |
+
+### Examples for how to use these in the config.json file
+
+The following example will return every email that contains the word `Contract` or `contract` during 2023 and 2024.
+
+```json
+{
+  "search_query": "'Contract' after:2023/01/01 before:2024/12/31",
+  "output_folder": "archived_emails",
+  "pdf_filename": "consolidated_archive.pdf"
+}
+```
