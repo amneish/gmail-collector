@@ -80,8 +80,30 @@ def main():
     print("="*60 + "\n")
 
     service = get_gmail_service()
-    results = service.users().messages().list(userId='me', q=config['search_query']).execute()
-    messages = results.get('messages', [])
+    
+    messages = []
+    page_token = None
+    
+    print("Fetching email list from Gmail...")
+    while True:
+        results = service.users().messages().list(
+            userId='me', 
+            q=config['search_query'], 
+            pageToken=page_token
+        ).execute()
+        
+        # Add the current page of messages to our master list
+        page_messages = results.get('messages', [])
+        messages.extend(page_messages)
+        
+        # Check if there is another page
+        page_token = results.get('nextPageToken')
+        if not page_token:
+            break
+        
+        print(f"  > Loaded {len(messages)} messages so far...")
+    total_emails = len(messages)
+    print(f"  > Loaded {len(messages)} total")
 
     if not messages:
         print("No messages found.")
@@ -125,7 +147,7 @@ def main():
     # Initialize the email_id_counter    
     email_id_counter = 1
 
-    print(f"Found {len(messages)} messages. Processing...")
+    print(f"Found {total_emails} messages. Processing...")
     for msg in tqdm(messages, desc="Processing Emails", unit="email"):
         m = service.users().messages().get(userId='me', id=msg['id']).execute()
         payload = m['payload']
@@ -169,7 +191,7 @@ def main():
 
         combined_html += f"<div class='email-container'>"
         combined_html += f"<div class='header'>"
-        combined_html += f"<b>Email #:</b> {email_id_counter}/{len(messages)}<br>"
+        combined_html += f"<b>Email #:</b> {email_id_counter}/{total_emails}<br>"
         combined_html += f"<b>Subject:</b> {subject}<br>"
         combined_html += f"<b>From:</b> {sender}<br>"
         combined_html += f"<b>To:</b> {receiver}<br>"

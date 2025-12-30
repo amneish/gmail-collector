@@ -1,5 +1,5 @@
 {
-  "search_query": "after:2025/12/28",
+  "search_query": "after:2025/12/15 before:2025/12/30",
   "output_folder": "gmail_archive",
   "pdf_filename": "consolidated_emails.pdf"
 }
