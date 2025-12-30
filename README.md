@@ -1,7 +1,7 @@
 ## Installation
 
 ### 1. Python Setup
-Once `wkhtmltopdf` is installed, run the following command in the project root:
+Run the following command in the project root:
 ```bash
 pip install .
 ```
@@ -87,7 +87,7 @@ The filter operators can be combined using AND, OR, NOT, and Grouping logic.
 | :--- | :--- | :--- |
 | AND | Space between filters | `from:boss has:attachment subject:Urgent` |
 | OR | Capital `OR` | `from:apple OR from:google` |
-| NOT | `-` (Minus - Excludes certain results) | `-from:noreply@ads.com` |
+| NOT | `-` (Minus: Excludes certain results) | `-from:noreply@ads.com` |
 | Grouping | Parentheses `()` | `from:me (subject:Report OR subject:Update)` |
 
 ### Examples for how to use these in the config.json file
