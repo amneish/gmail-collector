@@ -41,21 +41,20 @@ def clean_html(raw_html):
     
     soup = BeautifulSoup(raw_html, "html.parser")
     
-    # 1. Remove scripts, styles, and meta tags
-    for tag in soup(["script", "style", "link", "meta", "img", "video", "audio"]):
+    # 1. Remove scripts, styles, meta, and images
+    for tag in soup(["script", "style", "link", "meta", "img"]):
         tag.decompose()
 
-    # 2. Convert tables to simple divs to prevent the PmlTable crash
-    for table in soup.find_all("table"):
-        table.name = "div"
-    for row in soup.find_all(["tr", "td", "th"]):
-        row.name = "div"
+    # 2. To prevent the PmlTable crash, we convert tables to divs 
+    # but we will use CSS to make them invisible.
+    for tag in soup.find_all(["table", "tr", "td", "th", "tbody", "thead"]):
+        # Unwrapping keeps the content inside but removes the tag itself
+        # This is the most "bulletproof" way to avoid the row-height error
+        tag.unwrap() 
 
-    # 3. Aggressively strip attributes except basic links
-    allowed_attrs = ["href"]
+    # 3. Final scrub of remaining attributes
     for tag in soup.find_all(True):
-        # This removes all widths, heights, colors, and 'star' values that break the PDF
-        tag.attrs = {name: value for name, value in tag.attrs.items() if name in allowed_attrs}
+        tag.attrs = {} # Clear all attributes (removes borders, colors, widths)
 
     return str(soup)
 
@@ -82,10 +81,26 @@ def main():
     combined_html = """
     <html>
     <head><meta charset="UTF-8"><style>
-        @page { size: letter; margin: 1in; }
-        body { font-family: Helvetica, Arial, sans-serif; font-size: 10pt; }
-        .email-container { page-break-after: always; border-bottom: 1px solid #ccc; padding: 20px 0; }
-        .header { background-color: #f4f4f4; padding: 10px; margin-bottom: 10px; }
+        @page { size: letter; margin: 0.75in; }
+        body { 
+            font-family: Helvetica, Arial, sans-serif; 
+            font-size: 10pt; 
+            line-height: 1.5; 
+            color: #000000;
+        }
+        .email-container { 
+            page-break-after: always; 
+            margin-bottom: 30px;
+        }
+        .header { 
+            background-color: #f8f8f8; 
+            border-bottom: 1px solid #eeeeee;
+            padding: 15px; 
+            margin-bottom: 20px;
+        }
+        b { color: #333333; }
+        /* Ensure no stray lines appear */
+        div, p { border: none !important; outline: none !important; }
     </style></head>
     <body>
     """
