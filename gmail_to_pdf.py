@@ -90,6 +90,9 @@ def main():
         print("No messages found.")
         return
 
+    # Reverse order of messages so the appear from oldest to newest
+    messages.reverse()
+
     config['output_folder'] = 'output_folder/' + config['output_folder']
 
     if not os.path.exists(config['output_folder']):
