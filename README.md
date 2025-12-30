@@ -44,7 +44,7 @@ Open your terminal or Command Prompt in the project directory (`<path-to-gmail-c
 python -m gmail_to_pdf
 ```
 
-### 3. Authorize the App
+### 3. Authorize the App (First run only)
 - On the first run, your default web browser will open.
 - Log in to your Gmail account.
 - You may see a screen saying "Google hasn't verified this app" (this is normal for personal projects). Click Advanced > Go to [App Name] (unsafe).
