@@ -1,7 +1,7 @@
 import os
 import json
 import base64
-import re
+import shutil
 from tqdm import tqdm
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
@@ -148,6 +148,14 @@ def main():
         print(f"\nSuccess! PDF created at: {output_path}")
     else:
         print("\nPDF Engine encountered minor layout issues, but the file may still be usable.")
+
+    # Copy config.json to the output folder
+    try:
+        config_destination = os.path.join(config['output_folder'], 'config.json')
+        shutil.copy2('config.json', config_destination)
+        print(f"Config reference saved to: {config_destination}")
+    except Exception as e:
+        print(f"Could not copy config file: {e}")
 
 if __name__ == '__main__':
     main()
