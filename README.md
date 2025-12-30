@@ -28,11 +28,11 @@ To run this tool, you need to create a "Desktop App" credential in Google Cloud:
 Follow these steps once you have completed the installation and Google API setup.
 
 ### 1. Configure your Search
-Open `config.json` in your project folder. This file tells the tool exactly which emails to look for and where to save them.
+Open `config.json`. This file tells the tool exactly which emails to look for and where to save them. You can edit this file with `notepad` or any other basic text editor.
 
 ```json
 {
-  "search_query": "category:primary label:work-project after:2024/01/01",
+  "search_query": "subject:(the contract) label:work-project after:2024/01/01",
   "output_folder": "archived_emails",
   "pdf_filename": "consolidated_archive.pdf"
 }
@@ -72,7 +72,7 @@ The `search_query` in your `config.json` uses standard Gmail syntax. You can com
 | `from:` | Emails from a specific person | `from:name@example.com` |
 | `to:` | Emails sent to a specific person | `to:name@example.com` |
 | `cc:` | Finds emails where the address was Carbon Copied. | `cc:name@example.com` |
-| `subject:` | Look for words in the subject line | `subject:invoice` |
+| `subject:` | Look for words in the subject line. Parentheses can be used to query a subject that uses multiple words | `subject:(company invoice)` |
 | `has:attachment` | Only include emails with files | `has:attachment` |
 | `newer_than:` / `older_than:` | Time-based from current date (d=days, m=months, y=years) | `newer_than:30d` |
 | `after:` / `before:` | Specific date ranges (YYYY/MM/DD) | `before:2024/01/01` |
