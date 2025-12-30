@@ -39,6 +39,11 @@ Open `config.json` in your project folder. This file tells the tool exactly whic
 ```
 
 ### 2. Execute the script
+
+#### 2a. Using gmail_to_pdf.bat for Windows Users
+double click on the file `gmail_to_pdf.bat`. A temporary terminal window will open displaying the progress of the tool. The terminal will display the output directory and consolidated email PDF created.
+
+#### 2b. Using Python
 Open your terminal or Command Prompt in the project directory (`<path-to-gmail-collector/>`) and run:
 ```bash
 python -m gmail_to_pdf
@@ -54,7 +59,8 @@ python -m gmail_to_pdf
 ### 4. View Results
 A progress bar will appear in your terminal. Once complete, navigate to your output_folder. You will find:
 - A single PDF containing all email threads with their original formatting.
-- All attachments from those emails saved individually in the same folder.
+- All attachments from those emails saved individually in the same folder. Their names will be prepended with an ID to order them and make them easier to associate with the emails in the PDF.
+   - Eg. `1 - <first_attachment_name>`, `2 - <second_attachment_name>`, etc.
 
 ## 🔍 Gmail Search Filter Guide
 
