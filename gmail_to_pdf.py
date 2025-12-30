@@ -122,8 +122,8 @@ def main():
     <body>
     """
 
-    # Initialize the attachment_counter that gets prepended to attachment names
-    attachment_counter = 1
+    # Initialize the email_id_counter    
+    email_id_counter = 1
 
     print(f"Found {len(messages)} messages. Processing...")
     for msg in tqdm(messages, desc="Processing Emails", unit="email"):
@@ -138,11 +138,12 @@ def main():
 
         # 1. Collect Attachment Filenames and Save Them
         attachment_names = []
+        attachment_counter = 1
         if 'parts' in payload:
             for part in payload['parts']:
                 original_filename = part.get('filename')
                 if original_filename:
-                    new_filename = f"{attachment_counter} - {original_filename}"
+                    new_filename = f"{email_id_counter}-{attachment_counter} - {original_filename}"
                     attachment_names.append(new_filename)
                     
                     att_id = part['body'].get('attachmentId')
@@ -166,6 +167,7 @@ def main():
 
         combined_html += f"<div class='email-container'>"
         combined_html += f"<div class='header'>"
+        combined_html += f"<b>Email #:</b> {email_id_counter}/{len(messages)}<br>"
         combined_html += f"<b>Subject:</b> {subject}<br>"
         combined_html += f"<b>From:</b> {sender}<br>"
         combined_html += f"<b>Date:</b> {date}<br>"
@@ -173,6 +175,8 @@ def main():
         combined_html += f"</div>"
         combined_html += safe_email_html
         combined_html += "</div>"
+
+        email_id_counter += 1
 
     combined_html += "</body></html>"
     output_path = os.path.join(config['output_folder'], config['pdf_filename'])
