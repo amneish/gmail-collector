@@ -46,11 +46,8 @@ def clean_html(raw_html):
     for tag in soup(["script", "style", "link", "meta", "img"]):
         tag.decompose()
 
-    # 2. To prevent the PmlTable crash, we convert tables to divs 
-    # but we will use CSS to make them invisible.
+    # 2. Prevent PmlTable crashes by converting tables to divs
     for tag in soup.find_all(["table", "tr", "td", "th", "tbody", "thead"]):
-        # Unwrapping keeps the content inside but removes the tag itself
-        # This is the most "bulletproof" way to avoid the row-height error
         tag.unwrap() 
 
     # 3. Final scrub of remaining attributes
@@ -125,7 +122,7 @@ def main():
     <body>
     """
 
-    # Initialize the counter before the loop starts
+    # Initialize the attachment_counter that gets prepended to attachment names
     attachment_counter = 1
 
     print(f"Found {len(messages)} messages. Processing...")
@@ -145,7 +142,6 @@ def main():
             for part in payload['parts']:
                 original_filename = part.get('filename')
                 if original_filename:
-                    # Create the new prefixed name
                     new_filename = f"{attachment_counter} - {original_filename}"
                     attachment_names.append(new_filename)
                     
@@ -155,7 +151,6 @@ def main():
                             userId='me', messageId=msg['id'], id=att_id).execute()
                         file_data = base64.urlsafe_b64decode(attachment['data'].encode('UTF-8'))
                         
-                        # Save with the new prefixed filename
                         with open(os.path.join(config['output_folder'], new_filename), 'wb') as f:
                             f.write(file_data)
                         
