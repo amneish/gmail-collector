@@ -8,7 +8,8 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 from googleapiclient.discovery import build
 from xhtml2pdf import pisa
-from bs4 import BeautifulSoup  # New cleaning library
+from bs4 import BeautifulSoup
+from email.utils import parseaddr
 
 SCOPES = ['https://www.googleapis.com/auth/gmail.readonly']
 
@@ -114,7 +115,8 @@ def main():
         headers = payload.get('headers', [])
         
         subject = next((h['value'] for h in headers if h['name'] == 'Subject'), "No Subject")
-        sender = next((h['value'] for h in headers if h['name'] == 'From'), "Unknown")
+        full_from = next((h['value'] for h in headers if h['name'] == 'From'), "Unknown")
+        _, sender = parseaddr(full_from)
         date = next((h['value'] for h in headers if h['name'] == 'Date'), "")
 
         raw_email_html = get_html_body(payload)
