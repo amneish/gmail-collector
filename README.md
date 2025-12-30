@@ -77,7 +77,7 @@ The `search_query` in your `config.json` uses standard Gmail syntax. You can com
 | `newer_than:` / `older_than:` | Time-based from current date (d=days, m=months, y=years) | `newer_than:30d` |
 | `after:` / `before:` | Specific date ranges (YYYY/MM/DD) | `before:2024/01/01` |
 | `'Exact Phrase'` | Use single quotes to find a specific phrase (not case sensitive) | `'Contract'` |
-| `label:` | Finds emails that you have tagged with a specific Gmail label | `label:Work` |
+| `label:` | Finds emails that you have tagged with a specific Gmail label. Note: Gmail replaces spaces with `-` for labels that are multiple words. So `work folder` becomes `work-folder` | `label:Work` |
 | `is:unread` | Only finds emails that you have not read yet | `is:unread` |
 
 ### Combining Filters with Operators
