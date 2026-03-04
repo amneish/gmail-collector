@@ -27,14 +27,34 @@ def get_gmail_service():
             token.write(creds.to_json())
     return build('gmail', 'v1', credentials=creds)
 
-def get_html_body(payload):
-    if payload.get('mimeType') == 'text/html':
-        return base64.urlsafe_b64decode(payload['body']['data']).decode('utf-8', errors='ignore')
-    if 'parts' in payload:
-        for part in payload['parts']:
-            html = get_html_body(part)
-            if html: return html
-    return ""
+def get_body(payload):
+    # Dictionary to hold the best available parts
+    body_parts = {'html': '', 'plain': ''}
+
+    def walk_parts(part):
+        mime_type = part.get('mimeType')
+        body = part.get('body', {})
+        data = body.get('data')
+
+        if data:
+            content = base64.urlsafe_b64decode(data).decode('utf-8', errors='ignore')
+            if mime_type == 'text/html':
+                body_parts['html'] = content
+            elif mime_type == 'text/plain':
+                body_parts['plain'] = content
+
+        if 'parts' in part:
+            for subpart in part['parts']:
+                walk_parts(subpart)
+
+    walk_parts(payload)
+    
+    # Return HTML if it exists, otherwise return Plain Text (wrapped in <pre> for formatting)
+    if body_parts['html']:
+        return body_parts['html']
+    elif body_parts['plain']:
+        return f"<pre style='white-space: pre-wrap;'>{body_parts['plain']}</pre>"
+    return "<i>(No message body found)</i>"
 
 def clean_html(raw_html):
     if not raw_html:
@@ -120,26 +140,35 @@ def main():
     combined_html = """
     <html>
     <head><meta charset="UTF-8"><style>
-        @page { size: letter; margin: 0.75in; }
-        body { 
-            font-family: Helvetica, Arial, sans-serif; 
-            font-size: 10pt; 
-            line-height: 1.5; 
-            color: #000000;
-        }
-        .email-container { 
-            page-break-after: always; 
-            margin-bottom: 30px;
-        }
-        .header { 
-            background-color: #f8f8f8; 
-            border-bottom: 1px solid #eeeeee;
-            padding: 15px; 
-            margin-bottom: 20px;
-        }
-        b { color: #333333; }
-        /* Ensure no stray lines appear */
-        div, p { border: none !important; outline: none !important; }
+    @page { size: letter; margin: 0.75in; }
+    body { 
+        font-family: Helvetica, Arial, sans-serif; 
+        font-size: 10pt; 
+        line-height: 1.5; 
+        color: #000000;
+    }
+    .email-container { 
+        page-break-after: always; 
+        margin-bottom: 30px;
+        width: 100%;        /* Force container to page width */
+        overflow: hidden;    /* Clip anything that tries to escape */
+    }
+    /* This is the magic fix for long lines/URLs */
+    .email-body {
+        word-wrap: break-word;
+        word-break: break-all;
+    }
+    .header { 
+        background-color: #f8f8f8; 
+        border-bottom: 1px solid #eeeeee;
+        padding: 15px; 
+        margin-bottom: 20px;
+    }
+    pre {
+        white-space: pre-wrap;       /* Respect line breaks in plain text */
+        word-wrap: break-word;      /* But wrap them if they are too long */
+        font-family: Helvetica, Arial, sans-serif;
+    }
     </style></head>
     <body>
     """
@@ -186,7 +215,7 @@ def main():
         att_str = ", ".join(attachment_names) if attachment_names else "None"
 
         # 3. Build the Header with Attachment Metadata
-        raw_email_html = get_html_body(payload)
+        raw_email_html = get_body(payload)
         safe_email_html = clean_html(raw_email_html)
 
         combined_html += f"<div class='email-container'>"
@@ -197,9 +226,9 @@ def main():
         combined_html += f"<b>To:</b> {receiver}<br>"
         combined_html += f"<b>Date:</b> {date}<br>"
         combined_html += f"<b>Attachments:</b> {att_str}" # New metadata line
-        combined_html += f"</div>"
-        combined_html += safe_email_html
-        combined_html += "</div>"
+        combined_html += f"</div>" # End of header
+        combined_html += f"<div class='email-body'>{safe_email_html}</div>" # Wrapped body
+        combined_html += "</div>" # End of email-container
 
         email_id_counter += 1
 
