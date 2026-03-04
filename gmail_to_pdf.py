@@ -56,6 +56,12 @@ def get_body(payload):
         return f"<pre style='white-space: pre-wrap;'>{body_parts['plain']}</pre>"
     return "<i>(No message body found)</i>"
 
+def get_header_value(headers, target_name):
+    for h in headers:
+        if h['name'].lower() == target_name.lower():
+            return h['value']
+    return "Unknown" # Fallback if not found
+
 def clean_html(raw_html):
     if not raw_html:
         return ""
@@ -182,12 +188,18 @@ def main():
         payload = m['payload']
         headers = payload.get('headers', [])
         
-        subject = next((h['value'] for h in headers if h['name'] == 'Subject'), "No Subject")
-        full_from = next((h['value'] for h in headers if h['name'] == 'From'), "Unknown")
+        subject = get_header_value(headers, 'Subject')
+        full_from = get_header_value(headers, 'From')
         _, sender = parseaddr(full_from)
-        full_to = next((h['value'] for h in headers if h['name'] == 'To'), "Unknown")
+
+        full_to = get_header_value(headers, 'To')
         _, receiver = parseaddr(full_to)
-        date = next((h['value'] for h in headers if h['name'] == 'Date'), "")
+
+        date = get_header_value(headers, 'Date')
+
+        # If parseaddr fails to find an email, use the raw header value
+        sender = sender if sender else full_from
+        receiver = receiver if receiver else full_to
 
         # 1. Collect Attachment Filenames and Save Them
         attachment_names = []
