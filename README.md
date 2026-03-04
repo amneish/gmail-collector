@@ -49,8 +49,8 @@ Open your terminal or Command Prompt in the project directory (`<path-to-gmail-c
 python -m gmail_to_pdf
 ```
 
-### 3. Authorize the App (First run only)
-- On the first run, your default web browser will open.
+### 3. Authorize the App (First run / Token Expired)
+- Run the program and your default web browser will open.
 - Log in to your Gmail account.
 - You may see a screen saying "Google hasn't verified this app" (this is normal for personal projects). Click Advanced > Go to [App Name] (unsafe).
 - Click Allow to grant the tool read-only access to your emails.
@@ -101,3 +101,13 @@ The following example will return every email that contains the word `Contract` 
   "pdf_filename": "consolidated_archive.pdf"
 }
 ```
+
+### Debugging
+
+The token created in Step 3 expires after a short period of time. If you see the following error, it means the token has expired:
+
+```
+google.auth.exceptions.RefreshError: ('invalid_grant: Bad Request', {'error': 'invalid_grant', 'error_description': 'Bad Request'})
+```
+
+In this case, delete the token file, and repeat Step 3. This will recreate a valid token file.
